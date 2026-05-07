@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ИИ-детектив для нефтяных данных | АльметТех AWW 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f7f7f8;
+    --bg3: #f0f0f2;
+    --border: #e8e8ec;
+    --border2: #d0d0d8;
+    --text: #0a0a0f;
+    --text2: #555560;
+    --text3: #9090a0;
+    --green: #1DB87A;
+    --green-light: #e8faf3;
+    --green-border: #b8ecd8;
+    --purple: #7B5CF0;
+    --purple-light: #f0edff;
+    --purple-border: #c8b8f8;
+    --black: #0a0a0f;
+    --radius: 14px;
+    --radius-pill: 100px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-logo {
+    font-size: 15px; font-weight: 800; letter-spacing: -0.02em;
+    color: var(--black);
+    display: flex; flex-direction: column; line-height: 1;
+  }
+  .nav-logo span { color: var(--green); font-weight: 400; font-size: 12px; letter-spacing: 0.04em; margin-top: 1px; }
+  .nav-links { display: flex; gap: 6px; }
+  .nav-links a {
+    font-size: 13px; color: var(--text2); text-decoration: none;
+    padding: 6px 14px; border-radius: var(--radius-pill);
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .nav-links a:hover { background: var(--bg2); color: var(--text); border-color: var(--border2); }
+
+  /* HERO */
+  .hero {
+    padding: 72px 48px 64px;
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+  }
+  .hero-eyebrow {
+    font-size: 13px; color: var(--text3); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--green); }
+  .hero-titles { margin-bottom: 24px; }
+  .pill-title {
+    display: inline-block;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900; letter-spacing: -0.03em;
+    line-height: 1.05; margin-bottom: 8px;
+  }
+  .pill-black {
+    background: var(--black); color: #fff;
+    padding: 4px 20px; border-radius: var(--radius-pill);
+    display: block; width: fit-content;
+  }
+  .pill-outline {
+    background: transparent; color: var(--black);
+    padding: 4px 20px; border-radius: var(--radius-pill);
+    border: 2.5px solid var(--black);
+    display: block; width: fit-content;
+  }
+  .pill-green {
+    background: var(--green); color: #fff;
+    padding: 4px 20px; border-radius: var(--radius-pill);
+    display: block; width: fit-content;
+  }
+  .hero-desc {
+    font-size: 16px; color: var(--text2); max-width: 480px;
+    line-height: 1.7; margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: flex; gap: 0;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .meta-item {
+    flex: 1; padding: 14px 16px;
+    border-right: 1px solid var(--border);
+  }
+  .meta-item:last-child { border-right: none; }
+  .meta-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+  .meta-val { font-size: 13px; font-weight: 600; color: var(--text); }
+
+  /* Hero visual */
+  .hero-visual {
+    display: flex; align-items: center; justify-content: center;
+    position: relative; height: 400px;
+  }
+  .visual-blob {
+    width: 380px; height: 380px; border-radius: 50% 40% 60% 45%;
+    background: linear-gradient(135deg, #b8f0d8 0%, #c8b8f8 50%, #a8d8f8 100%);
+    opacity: 0.5; animation: morph 8s ease-in-out infinite;
+    position: relative;
+  }
+  .visual-blob::after {
+    content: ''; position: absolute; inset: 20px;
+    border-radius: 40% 60% 45% 55%;
+    background: linear-gradient(135deg, #90e8c0 0%, #b0a0f0 100%);
+    opacity: 0.7;
+    animation: morph 6s ease-in-out infinite reverse;
+  }
+  @keyframes morph {
+    0%, 100% { border-radius: 50% 40% 60% 45%; }
+    33% { border-radius: 60% 50% 40% 55%; }
+    66% { border-radius: 40% 60% 55% 45%; }
+  }
+  .visual-stats {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: var(--radius-pill); padding: 8px 20px;
+    font-weight: 700; font-size: 14px; color: var(--black);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .stat-pill span { color: var(--green); }
+
+  /* SECTIONS */
+  .section-wrap { max-width: 1200px; margin: 0 auto; padding: 64px 48px; }
+  .section-wrap + .section-wrap { padding-top: 0; }
+  hr { border: none; border-top: 1px solid var(--border); max-width: 1200px; margin: 0 auto; }
+  .section-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text3); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-eyebrow::after { content: ''; flex: 1; max-width: 48px; height: 1px; background: var(--border2); }
+  h2 { font-size: 36px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 32px; line-height: 1.1; }
+
+  /* CARDS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { border-color: var(--border2); box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .card p { font-size: 14px; color: var(--text2); line-height: 1.65; }
+  .card-accent { border-top: 3px solid var(--green); }
+  .card-accent-purple { border-top: 3px solid var(--purple); }
+
+  /* DATA TABLE */
+  .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; padding: 10px 16px; background: var(--bg2);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text3);
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg2); }
+  .col-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--purple); font-weight: 600; }
+  .range-pill {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--green-light); color: var(--green);
+    border: 1px solid var(--green-border);
+    padding: 2px 10px; border-radius: var(--radius-pill); display: inline-block; font-weight: 600;
+  }
+
+  /* ERRORS */
+  .error-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+    transition: all 0.2s;
+  }
+  .error-card:hover { border-color: var(--border2); box-shadow: 0 4px 20px rgba(0,0,0,0.06); transform: translateY(-2px); }
+  .error-num { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .error-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .error-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+  .code-inline {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--bg3); color: var(--purple);
+    padding: 6px 12px; border-radius: 6px; display: block; border: 1px solid var(--border);
+  }
+
+  /* RESULT */
+  .result-box { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .result-header { padding: 18px 24px; background: var(--black); color: #fff; font-size: 14px; font-weight: 700; }
+  .result-header.green { background: var(--green); }
+  .result-item { display: flex; gap: 14px; padding: 14px 24px; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .result-item:last-child { border-bottom: none; }
+  .result-n {
+    width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+    background: var(--bg3); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--text2);
+  }
+  .result-n.green { background: var(--green-light); border-color: var(--green-border); color: var(--green); }
+  .result-text strong { font-size: 14px; font-weight: 600; display: block; margin-bottom: 2px; }
+  .result-text span { font-size: 13px; color: var(--text2); }
+
+  /* LEVELS */
+  .levels { display: flex; flex-direction: column; gap: 10px; }
+  .level {
+    display: flex; align-items: center; gap: 16px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 20px; transition: all 0.2s;
+  }
+  .level:hover { border-color: var(--border2); background: var(--bg2); }
+  .level-badge {
+    font-size: 12px; font-weight: 700; padding: 4px 14px;
+    border-radius: var(--radius-pill); white-space: nowrap; flex-shrink: 0;
+  }
+  .level-desc { font-size: 14px; color: var(--text2); }
+  .level-desc code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--bg3); color: var(--purple);
+    padding: 1px 6px; border-radius: 4px;
+  }
+
+  /* PLAN TIMELINE */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-row { display: grid; grid-template-columns: 64px 1fr; gap: 20px; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid var(--border2); background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--text);
+    flex-shrink: 0; z-index: 1;
+  }
+  .tl-dot.active { background: var(--black); color: #fff; border-color: var(--black); }
+  .tl-line { width: 2px; background: var(--border); flex: 1; margin: 4px 0; }
+  .tl-row:last-child .tl-line { display: none; }
+  .tl-content { padding: 8px 0 28px; }
+  .tl-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .tl-content p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* APP DESIGN — Architecture */
+  .arch { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+  .arch-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 24px; border-bottom: 1px solid var(--border); transition: background 0.15s;
+  }
+  .arch-row:last-child { border-bottom: none; }
+  .arch-row:hover { background: var(--bg2); }
+  .arch-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .arch-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .arch-sub { font-size: 12px; color: var(--text2); }
+  .arch-code {
+    margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--purple); background: var(--purple-light);
+    padding: 3px 10px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* APP STEPS */
+  .steps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .step-card {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px; transition: all 0.2s; background: var(--bg);
+  }
+  .step-card:hover { border-color: var(--border2); box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+  .step-n { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  .step-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .step-subtitle { font-size: 12px; color: var(--text3); margin-bottom: 10px; font-style: italic; }
+  .step-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .step-code {
+    margin-top: 12px; background: var(--bg3); border-radius: 8px;
+    padding: 10px 14px; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text2); line-height: 1.8; border: 1px solid var(--border);
+  }
+  .kw { color: var(--purple); }
+  .fn { color: #0a7a5a; }
+  .st { color: #c05000; }
+  .cm { color: var(--text3); }
+
+  /* LAYOUT TABLE */
+  .layout-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+  .layout-table th { text-align: left; padding: 8px 12px; background: var(--bg3); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); }
+  .layout-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+  .layout-table tr:last-child td { border-bottom: none; }
+  .layout-table .lt { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--purple); font-weight: 600; }
+
+  /* TIPS */
+  .tip { border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .tip-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+  .tip p { font-size: 13px; color: var(--text2); line-height: 1.65; }
+  .tip strong { color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border); padding: 28px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--text3); font-size: 13px;
+  }
+  footer a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+  footer a:hover { color: var(--green); }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 80px 20px 48px; }
+    .hero-visual { display: none; }
+    .section-wrap { padding: 48px 20px; }
+    .grid-2, .grid-3, .steps-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">АЛЬМЕТ<span>ТЕХ · AWW 2026</span></div>
+  <div class="nav-links">
+    <a href="#context">Задача</a>
+    <a href="#data">Данные</a>
+    <a href="#errors">Ошибки</a>
+    <a href="#result">Результат</a>
+    <a href="#app">Приложение</a>
+    <a href="#plan">План</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-left">
+    <div class="hero-eyebrow">IT-трек · Advanced Workshop Week · 13–18 мая</div>
+    <div class="hero-titles">
+      <div class="pill-title pill-black">ИИ-детектив</div>
+      <div class="pill-title pill-outline">для нефтяных</div>
+      <div class="pill-title pill-green">данных</div>
+    </div>
+    <p class="hero-desc">
+      Данные керновых исследований копятся десятилетиями — из архивов, лабораторий, цифровых систем.
+      В них прячутся ошибки. Найдите их все и постройте инструмент, который делает это автоматически.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="meta-label">Руководитель</div>
+        <div class="meta-val">Демидова Г.Л.</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Длительность</div>
+        <div class="meta-val">7 дней</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Команда</div>
+        <div class="meta-val">3–4 человека</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Стек</div>
+        <div class="meta-val">Python · PyQt6</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="visual-blob"></div>
+    <div class="visual-stats">
+      <div class="stat-pill">303 записи · 10 скважин</div>
+      <div class="stat-pill"><span>6</span> типов ошибок</div>
+      <div class="stat-pill">от данных до <span>MVP</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT -->
+<hr>
+<div class="section-wrap" id="context">
+  <div class="section-eyebrow">Контекст</div>
+  <h2>Почему это важно</h2>
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h3>Реальная задача</h3>
+      <p>Нефтяные компании строят геологические модели на основе данных керна — образцов горной породы из скважин. От качества данных зависит точность подсчёта запасов и проектирование добычи.</p>
+    </div>
+    <div class="card">
+      <h3>Проблема</h3>
+      <p>Данные накапливались десятилетиями из бумажных архивов, лабораторий, цифровых систем. При оцифровке неизбежно появляются ошибки. Если их не найти — геологические модели дадут неверные результаты.</p>
+    </div>
+    <div class="card">
+      <h3>Задача команды</h3>
+      <p>Получить «грязный» датасет с 303 записями по 10 скважинам. Найти все ошибки шести типов. Построить инструмент, который автоматически верифицирует любой CSV с данными керна.</p>
+    </div>
+    <div class="card card-accent-purple">
+      <h3>Что получите</h3>
+      <p>Опыт работы с реальной промышленной задачей, навык EDA и статистического анализа данных, готовый кейс в портфолио и возможность поступить в магистратуру без вступительных испытаний.</p>
+    </div>
+  </div>
+</div>
+
+<!-- DATA -->
+<hr>
+<div class="section-wrap" id="data">
+  <div class="section-eyebrow">Данные</div>
+  <h2>Датасет <span style="font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--purple);">core_data_dirty_v2.csv</span></h2>
+  <p style="color:var(--text2);margin-bottom:24px;">303 строки · 10 скважин · 3 лаборатории · координаты скважин · геологические зоны А, Б, В</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Столбец</th><th>Описание</th><th>Допустимый диапазон</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="col-code">well_id</td><td>Номер скважины (Well_1 — Well_10)</td><td>—</td></tr>
+        <tr><td class="col-code">depth_m</td><td>Глубина отбора образца</td><td>метры</td></tr>
+        <tr><td class="col-code">porosity</td><td>Пористость — доля пор в объёме породы</td><td><span class="range-pill">0 — 1</span></td></tr>
+        <tr><td class="col-code">permeability_mD</td><td>Проницаемость — способность породы пропускать жидкость</td><td><span class="range-pill">&gt; 0 мД</span></td></tr>
+        <tr><td class="col-code">density_gcc</td><td>Плотность породы (кварц 2.65, кальцит 2.71, доломит 2.87)</td><td><span class="range-pill">2.0 — 2.9</span></td></tr>
+        <tr><td class="col-code">water_saturation</td><td>Водонасыщенность — доля пор, заполненных водой</td><td><span class="range-pill">0 — 1</span></td></tr>
+        <tr><td class="col-code">oil_saturation</td><td>Нефтенасыщенность — доля пор, заполненных нефтью</td><td><span class="range-pill">Sw+So ≤ 1</span></td></tr>
+        <tr><td class="col-code">year</td><td>Год исследования</td><td>1990 — 2019</td></tr>
+        <tr><td class="col-code">lab_id</td><td>Лаборатория (Lab_A, Lab_B, Lab_C)</td><td>—</td></tr>
+        <tr><td class="col-code">x_m, y_m</td><td>Координаты скважины на месторождении</td><td>метры</td></tr>
+        <tr><td class="col-code">геол_зона</td><td>Геологическая зона (А, Б, В)</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ERRORS -->
+<hr>
+<div class="section-wrap" id="errors">
+  <div class="section-eyebrow">Что искать</div>
+  <h2>6 типов ошибок</h2>
+  <div class="grid-3">
+    <div class="error-card">
+      <div class="error-num" style="color:#c0392b;">Тип 1</div>
+      <div class="error-title">Невозможная пористость</div>
+      <div class="error-desc">Пористость — доля пор в породе. Не может быть отрицательной или больше 1.</div>
+      <code class="code-inline">~df['porosity'].between(0, 1)</code>
+    </div>
+    <div class="error-card">
+      <div class="error-num" style="color:#c0392b;">Тип 2</div>
+      <div class="error-title">Отрицательная проницаемость</div>
+      <div class="error-desc">Закон Дарси: поток всегда направлен по градиенту давления. Проницаемость всегда k&gt;0.</div>
+      <code class="code-inline">df['permeability_mD'] &lt; 0</code>
+    </div>
+    <div class="error-card">
+      <div class="error-num" style="color:#b7791f;">Тип 3</div>
+      <div class="error-title">Смещение столбца</div>
+      <div class="error-desc">Плотность породы: 2.0–2.9 г/см³. Если density&gt;10 — туда попала проницаемость при оцифровке.</div>
+      <code class="code-inline">~df['density_gcc'].between(1.5, 3.5)</code>
+    </div>
+    <div class="error-card">
+      <div class="error-num" style="color:#b7791f;">Тип 4</div>
+      <div class="error-title">Нарушение баланса насыщенностей</div>
+      <div class="error-desc">Нефть и вода не могут занять больше 100% пор: Sw + So ≤ 1 по определению.</div>
+      <code class="code-inline">water_sat + oil_sat &gt; 1.001</code>
+    </div>
+    <div class="error-card">
+      <div class="error-num" style="color:var(--purple);">Тип 5</div>
+      <div class="error-title">Дублирование записей</div>
+      <div class="error-desc">Одна строка записана дважды при двойной оцифровке архивных материалов.</div>
+      <code class="code-inline">df.duplicated(keep=False)</code>
+    </div>
+    <div class="error-card" style="border-color:var(--green-border);background:var(--green-light);">
+      <div class="error-num" style="color:var(--green);">Тип 6 — сложный</div>
+      <div class="error-title">Систематическое смещение</div>
+      <div class="error-desc">Одна лаборатория стабильно даёт другие значения из-за смены оборудования. Обнаруживается только через сравнение групп.</div>
+      <code class="code-inline" style="background:rgba(255,255,255,0.7);">stats.kruskal(*groups)</code>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<hr>
+<div class="section-wrap" id="result">
+  <div class="section-eyebrow">Результат</div>
+  <h2>Что сдаётся в конце недели</h2>
+  <div class="grid-2" style="margin-bottom:32px;">
+    <div class="result-box">
+      <div class="result-header">Минимум</div>
+      <div class="result-item">
+        <div class="result-n">1</div>
+        <div class="result-text"><strong>Jupyter Notebook</strong><span>Анализ данных, найденные аномалии, графики распределений, сравнение лабораторий</span></div>
+      </div>
+      <div class="result-item">
+        <div class="result-n">2</div>
+        <div class="result-text"><strong>Десктопное приложение</strong><span>Загрузка CSV через диалоговое окно, автоматическая верификация, таблица аномалий, сохранение отчёта на диск</span></div>
+      </div>
+      <div class="result-item">
+        <div class="result-n">3</div>
+        <div class="result-text"><strong>Статистический анализ лабораторий</strong><span>Boxplot + тест Крускала–Уоллиса. Доказать статистически, что одна лаборатория систематически отличается</span></div>
+      </div>
+    </div>
+    <div class="result-box">
+      <div class="result-header green">Бонус</div>
+      <div class="result-item">
+        <div class="result-n green">+</div>
+        <div class="result-text"><strong>Карта скважин</strong><span>Три визуализации: геологические зоны, медианная пористость, распределение аномалий по скважинам</span></div>
+      </div>
+      <div class="result-item">
+        <div class="result-n green">+</div>
+        <div class="result-text"><strong>Профили пористости по глубине</strong><span>Сравнение соседних скважин — совпадение трендов подтверждает корректность данных</span></div>
+      </div>
+      <div class="result-item">
+        <div class="result-n green">+</div>
+        <div class="result-text"><strong>Пространственный анализ</strong><span>Вариограмма связности и сходство пористости в зависимости от расстояния между скважинами</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-eyebrow" style="margin-bottom:16px;">Критерии оценки</div>
+  <div class="levels">
+    <div class="level">
+      <span class="level-badge" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border2);">Базовый</span>
+      <div class="level-desc">Правила физичности 1–4. <code>flags['ошибка'] = ...</code></div>
+    </div>
+    <div class="level">
+      <span class="level-badge" style="background:#e8f4ff;color:#1a6fc4;border:1px solid #b8d8f8;">Хороший</span>
+      <div class="level-desc">+ Дублирование записей, смещение столбца, визуальное сравнение лабораторий</div>
+    </div>
+    <div class="level">
+      <span class="level-badge" style="background:var(--purple-light);color:var(--purple);border:1px solid var(--purple-border);">Отличный</span>
+      <div class="level-desc">+ Тест Крускала–Уоллиса + работающее десктопное приложение с загрузкой CSV и сохранением отчёта</div>
+    </div>
+    <div class="level" style="border-color:var(--green-border);background:var(--green-light);">
+      <span class="level-badge" style="background:var(--green);color:#fff;border:1px solid var(--green);">Блестяще</span>
+      <div class="level-desc" style="color:#0a5a3a;">+ Карта скважин + профили по глубине + пространственный анализ</div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAN -->
+<hr>
+<div class="section-wrap" id="plan">
+  <div class="section-eyebrow">Расписание</div>
+  <h2>7 дней · от данных до приложения</h2>
+  <div class="timeline">
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot active">1</div><div class="tl-line"></div></div>
+      <div class="tl-content"><h4>EDA — изучение данных</h4><p>df.head(), df.describe(), гистограммы. Min и max сразу показывают аномалии. Scatter пористость vs log(проницаемость), раскраска по lab_id.</p></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot active">2</div><div class="tl-line"></div></div>
+      <div class="tl-content"><h4>Правила физичности</h4><p>Условия для всех четырёх параметров. Правило 1 написано как пример — остальные три команда пишет самостоятельно.</p></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot active">3</div><div class="tl-line"></div></div>
+      <div class="tl-content"><h4>Дубли, смещения, лаборатории</h4><p>df.duplicated(), диагностика смещений столбца. Boxplot и тест Крускала–Уоллиса — поиск систематического отклонения в данных одной лаборатории.</p></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot active" style="font-size:10px;">4–5</div><div class="tl-line"></div></div>
+      <div class="tl-content"><h4>Десктопное приложение</h4><p>Четыре вкладки: верификация, карта скважин, профили по глубине, пространственный анализ. Загрузка CSV через диалог, сохранение отчёта на диск. Запуск локально командой <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg3);padding:1px 6px;border-radius:4px;">python app_desktop.py</code>.</p></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot">6</div><div class="tl-line"></div></div>
+      <div class="tl-content"><h4>Пространственный анализ (бонус)</h4><p>Карта скважин по координатам x_m, y_m. Профили пористости по глубине для соседних скважин. Вариограмма пространственной связности.</p></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot">7</div><div class="tl-line"></div></div>
+      <div class="tl-content"><h4>Презентация</h4><p>Демо приложения. Команда представляет найденные ошибки, объясняет их геологический смысл и показывает работающий инструмент верификации.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP DESIGN -->
+<hr>
+<div class="section-wrap" id="app">
+  <div class="section-eyebrow">Проектирование приложения</div>
+  <h2>Как устроен код</h2>
+  <p style="color:var(--text2);max-width:640px;margin-bottom:28px;">Приложение состоит из трёх слоёв. Каждый решает свою задачу и не смешивается с другими — это делает код понятным и легко расширяемым.</p>
+
+  <div class="arch">
+    <div class="arch-row">
+      <div class="arch-icon" style="background:var(--purple-light);">UI</div>
+      <div>
+        <div class="arch-name">Интерфейс — класс MainWindow, методы _build_*</div>
+        <div class="arch-sub">Создаёт окна, вкладки, кнопки, таблицы. Ничего не считает — только отображает.</div>
+      </div>
+      <div class="arch-code">PyQt6</div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-icon" style="background:var(--green-light);">VZ</div>
+      <div>
+        <div class="arch-name">Визуализация — класс MplCanvas, методы update_*</div>
+        <div class="arch-sub">Строит графики matplotlib внутри PyQt-окна. После каждого рисования вызывает canvas.draw().</div>
+      </div>
+      <div class="arch-code">matplotlib</div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-icon" style="background:#e8f4ff;">DL</div>
+      <div>
+        <div class="arch-name">Данные и логика — run_verification(df), load_file()</div>
+        <div class="arch-sub">Принимает DataFrame, возвращает таблицу флагов. Не знает про кнопки, окна и графики.</div>
+      </div>
+      <div class="arch-code">pandas · scipy</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text3);font-size:13px;margin-bottom:24px;font-style:italic;">Главное правило: сначала думайте что показать пользователю, потом — как это вычислить. Не наоборот.</p>
+
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-n">Шаг 1</div>
+      <div class="step-title">Опишите приложение тремя предложениями</div>
+      <div class="step-subtitle">один абзац, без кода</div>
+      <div class="step-desc">Прежде чем писать строку кода — ответьте: что делает пользователь? Если не можете описать кратко, задача ещё не ясна. В нашем случае: пользователь загружает CSV, видит аномалии, сохраняет отчёт.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 2</div>
+      <div class="step-title">Нарисуйте схему на бумаге</div>
+      <div class="step-subtitle">макет интерфейса от руки</div>
+      <div class="step-desc">Переделать рисунок — 10 секунд. Переделать код — час. Нарисуйте все вкладки и что будет на каждой.</div>
+      <table class="layout-table">
+        <tr><th>Область</th><th>Содержимое</th></tr>
+        <tr><td>Шапка</td><td>Название + кнопки загрузки и сохранения</td></tr>
+        <tr><td>Вкладка 1</td><td>Метрики + график лабораторий + таблица аномалий</td></tr>
+        <tr><td>Вкладка 2</td><td>Три карты скважин</td></tr>
+        <tr><td>Вкладка 3</td><td>Профили пористости по глубине</td></tr>
+        <tr><td>Вкладка 4</td><td>Вариограмма + пространственный анализ</td></tr>
+      </table>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 3</div>
+      <div class="step-title">Логика — в отдельную функцию</div>
+      <div class="step-subtitle">данные отдельно от интерфейса</div>
+      <div class="step-desc">run_verification(df) ничего не знает про кнопки — принимает DataFrame и возвращает флаги. Её можно использовать и в Notebook без изменений.</div>
+      <div class="step-code"><span class="kw">def</span> <span class="fn">run_verification</span>(df):<br>&nbsp;&nbsp;flags = pd.DataFrame(index=df.index)<br>&nbsp;&nbsp;flags[<span class="st">'ошибка'</span>] = ~df[<span class="st">'porosity'</span>].between(0,1)<br>&nbsp;&nbsp;<span class="kw">return</span> flags</div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 4</div>
+      <div class="step-title">Главное окно — QMainWindow</div>
+      <div class="step-subtitle">класс как контейнер данных</div>
+      <div class="step-desc">Данные хранятся как атрибуты класса — все вкладки работают с одними и теми же объектами.</div>
+      <div class="step-code"><span class="kw">class</span> <span class="fn">MainWindow</span>(QMainWindow):<br>&nbsp;&nbsp;<span class="kw">def</span> <span class="fn">__init__</span>(self):<br>&nbsp;&nbsp;&nbsp;&nbsp;self.df = <span class="kw">None</span> &nbsp;<span class="cm"># датасет</span><br>&nbsp;&nbsp;&nbsp;&nbsp;self.flags = <span class="kw">None</span> <span class="cm"># флаги</span><br>&nbsp;&nbsp;&nbsp;&nbsp;self.clean = <span class="kw">None</span> <span class="cm"># чистые</span></div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 5</div>
+      <div class="step-title">Интерфейс из блоков — layout</div>
+      <div class="step-subtitle">виджеты в раскладках</div>
+      <div class="step-desc">PyQt укладывает виджеты в layout. Три основных типа:</div>
+      <table class="layout-table">
+        <tr><th class="lt">Layout</th><th>Как укладывает</th></tr>
+        <tr><td class="lt">QVBoxLayout</td><td>Сверху вниз</td></tr>
+        <tr><td class="lt">QHBoxLayout</td><td>Слева направо</td></tr>
+        <tr><td class="lt">QGridLayout</td><td>Сетка (для метрик)</td></tr>
+      </table>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 6</div>
+      <div class="step-title">Matplotlib в окне — MplCanvas</div>
+      <div class="step-subtitle">виджет-обёртка для графиков</div>
+      <div class="step-desc">Графики matplotlib не показываются сами в PyQt. Нужен FigureCanvas — его добавляют в layout как обычный виджет.</div>
+      <div class="step-code">canvas = <span class="fn">MplCanvas</span>(figsize=(10,5))<br>layout.<span class="fn">addWidget</span>(canvas)<br>ax = canvas.fig.<span class="fn">add_subplot</span>(111)<br>canvas.<span class="fn">draw</span>() <span class="cm"># обязательно!</span></div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 7</div>
+      <div class="step-title">Подключение кнопок — signals & slots</div>
+      <div class="step-subtitle">нажатие вызывает метод</div>
+      <div class="step-desc">Кнопка испускает сигнал clicked, мы подключаем его к методу. Нажатие — load_file() — обновление всех вкладок.</div>
+      <div class="step-code">btn.clicked.<span class="fn">connect</span>(self.load_file)<br><span class="cm"># нажатие → load_file() → update_all()</span></div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 8</div>
+      <div class="step-title">_build_* vs update_*</div>
+      <div class="step-subtitle">два разных типа методов</div>
+      <div class="step-desc">Виджеты создаются один раз при запуске (_build_*). Данные обновляются при каждой загрузке файла (update_*). Не путайте — это разная ответственность.</div>
+      <table class="layout-table">
+        <tr><th>Метод</th><th>Когда</th></tr>
+        <tr><td class="lt">_build_*</td><td>Один раз при запуске</td></tr>
+        <tr><td class="lt">update_*</td><td>При каждой загрузке</td></tr>
+      </table>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 9</div>
+      <div class="step-title">Стили — CSS в PyQt</div>
+      <div class="step-subtitle">единый внешний вид</div>
+      <div class="step-desc">PyQt поддерживает стили в синтаксисе CSS. Все стили собраны в одну строку STYLE в начале файла и применяются к MainWindow.</div>
+      <div class="step-code">STYLE = <span class="st">"""QPushButton {<br>&nbsp;&nbsp;background: #2E75B6;<br>&nbsp;&nbsp;border-radius: 6px;<br>}"""</span><br>app.<span class="fn">setStyleSheet</span>(STYLE)</div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">Шаг 10</div>
+      <div class="step-title">Точка входа — запуск</div>
+      <div class="step-subtitle">if __name__ == '__main__'</div>
+      <div class="step-desc">QApplication управляет событиями окна. MainWindow создаёт интерфейс. app.exec() запускает цикл обработки событий — приложение работает пока окно не закрыто.</div>
+      <div class="step-code"><span class="kw">if</span> __name__ == <span class="st">'__main__'</span>:<br>&nbsp;&nbsp;app = <span class="fn">QApplication</span>(sys.argv)<br>&nbsp;&nbsp;window = <span class="fn">MainWindow</span>()<br>&nbsp;&nbsp;window.<span class="fn">show</span>()<br>&nbsp;&nbsp;sys.<span class="fn">exit</span>(app.<span class="fn">exec</span>())</div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div style="margin-top:32px;">
+    <div class="section-eyebrow" style="margin-bottom:16px;">Советы команде</div>
+    <div class="grid-3">
+      <div class="tip">
+        <div class="tip-label">С чего начать</div>
+        <p>Начните с минимальной версии — одна кнопка, одна таблица. Потом добавляйте вкладки. Каждую вкладку делает один человек — они не мешают друг другу.</p>
+      </div>
+      <div class="tip">
+        <div class="tip-label">Частая ошибка</div>
+        <p>Если график не обновляется — вы не вызвали <strong>canvas.draw()</strong> после рисования. Если данные не видны во вкладке — вы не вызвали update_* после загрузки файла.</p>
+      </div>
+      <div class="tip">
+        <div class="tip-label">Совет</div>
+        <p>Пишите своё с нуля — так вы поймёте как это работает, а не просто воспроизведёте чужой код.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+<footer>
+  <div>ИИ-детектив для нефтяных данных · АльметТех AWW 2026</div>
+  <div>
+    <a href="https://almet.pish.itmo.ru/aww" target="_blank">almet.pish.itmo.ru/aww</a>
+    &nbsp;·&nbsp;
+    <a href="https://t.me/almet_tech" target="_blank">@almet_tech</a>
+  </div>
+</footer>
+
+</body>
+</html>
