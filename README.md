@@ -97,3 +97,8 @@ The tool should produce:
 Core analysis data have been accumulated for decades — from archives, laboratories, and digital systems. Hidden within these datasets are errors, inconsistencies, and anomalies.
 
 The goal of this project is to identify them systematically and develop an intelligent tool that can detect such issues automatically.
+
+
+<img width="1277" height="443" alt="Figure 2026-05-07 185150 (3)" src="https://github.com/user-attachments/assets/2f4af11d-c1e9-4c0c-a665-86f59e8eaa56" />
+<img width="857" height="498" alt="Figure 2026-05-07 185150 (6)" src="https://github.com/user-attachments/assets/f2deb86f-6e2e-4a2f-8ce7-b363758272ef" />
+
