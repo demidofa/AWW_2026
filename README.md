@@ -101,4 +101,6 @@ The goal of this project is to identify them systematically and develop an intel
 
 <img width="1277" height="443" alt="Figure 2026-05-07 185150 (3)" src="https://github.com/user-attachments/assets/2f4af11d-c1e9-4c0c-a665-86f59e8eaa56" />
 <img width="857" height="498" alt="Figure 2026-05-07 185150 (6)" src="https://github.com/user-attachments/assets/f2deb86f-6e2e-4a2f-8ce7-b363758272ef" />
+<img width="1774" height="1368" alt="gis_restoration" src="https://github.com/user-attachments/assets/70496347-d19f-4f4e-87c4-ff96b77e3a63" />
+<img width="1907" height="592" alt="gis_correlations" src="https://github.com/user-attachments/assets/a1fb9633-27f9-4602-890b-352ed1bca911" />
 
