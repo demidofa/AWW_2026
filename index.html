@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Задание команде | ИИ-детектив | АльметТех AWW 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f7f7f8; --bg3: #f0f0f2;
+    --border: #e8e8ec; --border2: #d0d0d8;
+    --text: #0a0a0f; --text2: #555560; --text3: #9090a0;
+    --green: #1DB87A; --green-light: #e8faf3; --green-border: #b8ecd8;
+    --purple: #7B5CF0; --purple-light: #f0edff; --purple-border: #c8b8f8;
+    --black: #0a0a0f; --radius: 14px; --radius-pill: 100px;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.9); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px; display: flex; align-items: center; justify-content: space-between; height: 56px;
+  }
+  .nav-logo { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; color: var(--black); display: flex; flex-direction: column; line-height: 1; }
+  .nav-logo span { color: var(--green); font-weight: 400; font-size: 12px; letter-spacing: 0.04em; margin-top: 1px; }
+  .nav-links { display: flex; gap: 6px; }
+  .nav-links a { font-size: 13px; color: var(--text2); text-decoration: none; padding: 6px 14px; border-radius: var(--radius-pill); border: 1px solid var(--border); transition: all 0.15s; }
+  .nav-links a:hover { background: var(--bg2); color: var(--text); border-color: var(--border2); }
+
+  .hero {
+    padding: 72px 48px 64px; max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+  }
+  .hero-eyebrow { font-size: 13px; color: var(--text3); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .hero-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--green); }
+  .pill-title { display: inline-block; font-size: clamp(32px, 5vw, 52px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 8px; }
+  .pill-black { background: var(--black); color: #fff; padding: 4px 20px; border-radius: var(--radius-pill); display: block; width: fit-content; }
+  .pill-outline { background: transparent; color: var(--black); padding: 4px 20px; border-radius: var(--radius-pill); border: 2.5px solid var(--black); display: block; width: fit-content; }
+  .pill-green { background: var(--green); color: #fff; padding: 4px 20px; border-radius: var(--radius-pill); display: block; width: fit-content; }
+  .hero-desc { font-size: 16px; color: var(--text2); max-width: 480px; line-height: 1.7; margin-bottom: 32px; }
+  .hero-meta { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .meta-item { flex: 1; padding: 14px 16px; border-right: 1px solid var(--border); }
+  .meta-item:last-child { border-right: none; }
+  .meta-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+  .meta-val { font-size: 13px; font-weight: 600; }
+
+  .hero-visual { display: flex; align-items: center; justify-content: center; position: relative; height: 380px; }
+  .visual-blob { width: 360px; height: 360px; border-radius: 50% 40% 60% 45%; background: linear-gradient(135deg, #b8f0d8 0%, #c8b8f8 50%, #a8d8f8 100%); opacity: 0.5; animation: morph 8s ease-in-out infinite; position: relative; }
+  .visual-blob::after { content: ''; position: absolute; inset: 20px; border-radius: 40% 60% 45% 55%; background: linear-gradient(135deg, #90e8c0 0%, #b0a0f0 100%); opacity: 0.7; animation: morph 6s ease-in-out infinite reverse; }
+  @keyframes morph { 0%,100%{border-radius:50% 40% 60% 45%} 33%{border-radius:60% 50% 40% 55%} 66%{border-radius:40% 60% 55% 45%} }
+  .visual-stats { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+  .stat-pill { background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.8); border-radius: var(--radius-pill); padding: 8px 20px; font-weight: 700; font-size: 14px; color: var(--black); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .stat-pill span { color: var(--green); }
+
+  .section-wrap { max-width: 1200px; margin: 0 auto; padding: 64px 48px; }
+  .section-wrap + .section-wrap { padding-top: 0; }
+  hr { border: none; border-top: 1px solid var(--border); max-width: 1200px; margin: 0 auto; }
+  .section-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .section-eyebrow::after { content: ''; flex: 1; max-width: 48px; height: 1px; background: var(--border2); }
+  h2 { font-size: 36px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 32px; line-height: 1.1; }
+  h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; transition: border-color 0.2s, box-shadow 0.2s; }
+  .card:hover { border-color: var(--border2); box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  .card p { font-size: 14px; color: var(--text2); line-height: 1.65; }
+  .card-green { border-top: 3px solid var(--green); }
+  .card-purple { border-top: 3px solid var(--purple); }
+  .card-blue { border-top: 3px solid #2E75B6; }
+  .card-amber { border-top: 3px solid #F59E0B; }
+
+  .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 16px; background: var(--bg2); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); }
+  td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg2); }
+  .col-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--purple); font-weight: 600; }
+
+  .range-pill { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); padding: 2px 10px; border-radius: var(--radius-pill); display: inline-block; font-weight: 600; }
+  .range-pill-purple { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--purple-light); color: var(--purple); border: 1px solid var(--purple-border); padding: 2px 10px; border-radius: var(--radius-pill); display: inline-block; font-weight: 600; }
+
+  /* TASK CARDS */
+  .task-card { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; transition: box-shadow 0.2s; }
+  .task-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .task-header { display: flex; align-items: center; gap: 16px; padding: 18px 24px; border-bottom: 1px solid var(--border); }
+  .task-num { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+  .task-title { font-size: 16px; font-weight: 700; }
+  .task-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .task-body { padding: 20px 24px; }
+  .task-body p { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+  .task-body p:last-child { margin-bottom: 0; }
+  .task-checklist { list-style: none; }
+  .task-checklist li { font-size: 14px; color: var(--text2); padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+  .task-checklist li:last-child { border-bottom: none; }
+  .task-checklist li::before { content: ''; width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--border2); flex-shrink: 0; margin-top: 1px; }
+  .task-result { background: var(--bg2); border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; color: var(--text2); }
+  .task-result strong { color: var(--text); font-weight: 600; }
+
+  /* FILE TREE */
+  .file-tree { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 2.4; }
+
+  /* NOTE */
+  .note { background: var(--green-light); border-left: 3px solid var(--green); border-radius: 0 var(--radius) var(--radius) 0; padding: 14px 18px; font-size: 13px; color: #0a5a3a; line-height: 1.6; margin-top: 16px; }
+  .note-purple { background: var(--purple-light); border-left: 3px solid var(--purple); border-radius: 0 var(--radius) var(--radius) 0; padding: 14px 18px; font-size: 13px; color: #4a2ab0; line-height: 1.6; margin-top: 16px; }
+  .note-amber { background: #FEF3C7; border-left: 3px solid #F59E0B; border-radius: 0 var(--radius) var(--radius) 0; padding: 14px 18px; font-size: 13px; color: #92400E; line-height: 1.6; margin-top: 16px; }
+
+  /* TIMELINE */
+  .timeline { display: flex; flex-direction: column; }
+  .tl-row { display: grid; grid-template-columns: 64px 1fr; gap: 20px; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border2); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .tl-dot.active { background: var(--black); color: #fff; border-color: var(--black); }
+  .tl-dot.green { background: var(--green); color: #fff; border-color: var(--green); }
+  .tl-dot.purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .tl-line { width: 2px; background: var(--border); flex: 1; margin: 4px 0; }
+  .tl-row:last-child .tl-line { display: none; }
+  .tl-content { padding: 8px 0 28px; }
+  .tl-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .tl-content p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* LEVELS */
+  .levels { display: flex; flex-direction: column; gap: 10px; }
+  .level { display: flex; align-items: center; gap: 16px; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; transition: all 0.2s; }
+  .level:hover { border-color: var(--border2); background: var(--bg2); }
+  .level-badge { font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: var(--radius-pill); white-space: nowrap; flex-shrink: 0; }
+  .level-desc { font-size: 14px; color: var(--text2); line-height: 1.5; }
+
+  footer { border-top: 1px solid var(--border); padding: 28px 48px; display: flex; justify-content: space-between; align-items: center; color: var(--text3); font-size: 13px; }
+  footer a { color: var(--text3); text-decoration: none; }
+  footer a:hover { color: var(--green); }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; } .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 80px 20px 48px; } .hero-visual { display: none; }
+    .section-wrap { padding: 48px 20px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">АЛЬМЕТ<span>ТЕХ · AWW 2026</span></div>
+  <div class="nav-links">
+    <a href="#files">Файлы</a>
+    <a href="#gis">Что такое ГИС</a>
+    <a href="#tasks-core">Задания: Верификация</a>
+    <a href="#tasks-ml">Задания: ML на керне</a>
+    <a href="#tasks-gis">Задания: ML на ГИС</a>
+    <a href="#app">Задания: Приложение</a>
+    <a href="#levels">Оценка</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Задание команде · Advanced Workshop Week · 13–18 мая</div>
+    <div style="margin-bottom:24px;">
+      <div class="pill-title pill-black">Задание</div>
+      <div class="pill-title pill-outline">команде</div>
+      <div class="pill-title pill-green">AWW 2026</div>
+    </div>
+    <p class="hero-desc">
+      За 7 дней вы пройдете полный путь: от «грязных» архивных данных —
+      до работающего инструмента, который автоматически находит ошибки,
+      кластеризует породы и восстанавливает утраченные измерения.
+      Это реальная задача нефтегазовой отрасли.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item"><div class="meta-label">Скважина</div><div class="meta-val">Well_45</div></div>
+      <div class="meta-item"><div class="meta-label">Месторождение</div><div class="meta-val">Березовское</div></div>
+      <div class="meta-item"><div class="meta-label">Данных</div><div class="meta-val">~14 000 точек</div></div>
+      <div class="meta-item"><div class="meta-label">Команда</div><div class="meta-val">3–4 чел.</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="visual-blob"></div>
+    <div class="visual-stats">
+      <div class="stat-pill">Керн · <span>303</span> образца</div>
+      <div class="stat-pill">ГИС · <span>10 295</span> точек</div>
+      <div class="stat-pill"><span>6</span> заданий на неделю</div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ФАЙЛЫ -->
+<div class="section-wrap" id="files">
+  <div class="section-eyebrow">Стартовый комплект</div>
+  <h2>Ваши файлы</h2>
+  
+  <div class="file-tree" style="margin-bottom:24px;">
+    <div style="color:var(--text3);margin-bottom:8px;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;">Папка проекта</div>
+    <div><span style="color:var(--purple);">├──</span> <span style="color:var(--green);">core_data_dirty_v2.csv</span> &nbsp;&nbsp;<span style="color:var(--text3);font-family:'Inter',sans-serif;">основной датасет — керновые данные 10 скважин</span></div>
+    <div><span style="color:var(--purple);">├──</span> <span style="color:var(--green);">gis_data_well45.csv</span> &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--text3);font-family:'Inter',sans-serif;">ГИС скважины Well_45 — 10 295 точек по глубине</span></div>
+    <div><span style="color:var(--purple);">├──</span> <span style="color:var(--green);">gis_data_clean.csv</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--text3);font-family:'Inter',sans-serif;">чистый ГИС для проверки (0 ошибок)</span></div>
+    <div><span style="color:var(--purple);">├──</span> <span style="color:var(--green);">gis_data_test_errors.csv</span> <span style="color:var(--text3);font-family:'Inter',sans-serif;">ГИС с ошибками всех типов для тестирования</span></div>
+    <div><span style="color:var(--purple);">├──</span> <span style="color:var(--green);">core_data_well45.csv</span> &nbsp;&nbsp;<span style="color:var(--text3);font-family:'Inter',sans-serif;">керн скважины Well_45 — для сопоставления с ГИС</span></div>
+    <div><span style="color:var(--purple);">├──</span> <span style="color:var(--green);">core_data_clean.csv</span> &nbsp;&nbsp;&nbsp;<span style="color:var(--text3);font-family:'Inter',sans-serif;">чистый керн для проверки (0 ошибок)</span></div>
+    <div><span style="color:var(--purple);">├──</span> <span style="color:var(--green);">core_data_test_errors.csv</span> <span style="color:var(--text3);font-family:'Inter',sans-serif;">керн со всеми типами ошибок для тестирования</span></div>
+
+  </div>
+
+  <div class="note-amber">Файлы <strong>*_clean</strong> и <strong>*_test_errors</strong> — это инструменты для проверки вашего кода. Загружайте их в приложение и скрипты, чтобы убедиться что все работает правильно.</div>
+</div>
+
+<hr>
+
+<!-- ЧТО ТАКОЕ ГИС -->
+<div class="section-wrap" id="gis">
+  <div class="section-eyebrow">Новые данные</div>
+  <h2>Что такое ГИС и зачем они нам</h2>
+
+  <div class="grid-2" style="margin-bottom:28px;">
+    <div>
+      <p style="font-size:16px;line-height:1.8;color:var(--text2);margin-bottom:16px;">
+        <strong style="color:var(--text);">ГИС — геофизические исследования скважин.</strong> Пока бурят скважину,
+        в нее спускают приборы которые непрерывно замеряют физические свойства породы
+        вдоль всего ствола — каждые 10 сантиметров. Это и есть каротаж.
+      </p>
+      <p style="font-size:15px;line-height:1.8;color:var(--text2);margin-bottom:16px;">
+        В отличие от керна (который отбирают в отдельных точках и везут в лабораторию),
+        ГИС дает непрерывную картину пласта по всей глубине скважины.
+        Наш файл — скважина Well_45, месторождение Березовское:
+        <strong style="color:var(--text);">10 295 точек с глубины 760 до 1789 метров.</strong>
+      </p>
+      <div class="note">У реального геолога ГИС и керн — это две стороны одной медали. ГИС — сплошной охват, керн — точные лабораторные измерения. Ваша задача — научить их «разговаривать» между собой.</div>
+    </div>
+    <div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Кривая</th><th>Что измеряет</th><th>Норма</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="col-code">PZ</td>
+              <td>Электрическое сопротивление породы, Ом·м. Высокое — нефть или газ в порах. Низкое — вода или глина.</td>
+              <td><span class="range-pill">&gt; 0</span></td>
+            </tr>
+            <tr>
+              <td class="col-code">PS</td>
+              <td>Самопотенциал — естественная разность потенциалов, мВ. Высокий — чистый коллектор. Низкий — глина.</td>
+              <td><span class="range-pill">любое</span></td>
+            </tr>
+            <tr>
+              <td class="col-code">GK</td>
+              <td>Гамма-каротаж — естественная радиоактивность породы, мкР/ч. Высокий — много глины. Низкий — чистый песчаник или карбонат.</td>
+              <td><span class="range-pill">3 — 16</span></td>
+            </tr>
+            <tr>
+              <td class="col-code">NGK</td>
+              <td>Нейтронный каротаж — реакция на тепловые нейтроны. Высокий — много водорода (глина или вода). Низкий — нефтенасыщенный пласт.</td>
+              <td><span class="range-pill">80 — 250</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-purple" style="margin-top:16px;">
+        <strong>Ключевая связь для ML:</strong> GK и NGK растут в глинах и падают в коллекторах — они коррелируют между собой. PS падает там где GK растет. Это физика — и именно это позволяет восстанавливать одну кривую по другим.
+      </div>
+    </div>
+  </div>
+
+  <!-- Типы ошибок ГИС -->
+  <h3 style="margin-bottom:16px;">Какие ошибки бывают в ГИС-данных</h3>
+  <div class="grid-2">
+    <div class="card card-blue">
+      <h3>Спайк (spike)</h3>
+      <p>Одиночный аномальный выброс — прибор на долю секунды среагировал на помеху. GK = 150 мкР/ч при норме 3–16 — явный спайк. На планшете каротажа выглядит как острый зубец.</p>
+    </div>
+    <div class="card card-amber">
+      <h3>Застрявший инструмент</h3>
+      <p>Прибор застрял в скважине и несколько метров записывал одно и то же значение. Признак: PS = 28.5 мВ на 30 точках подряд без малейшего изменения.</p>
+    </div>
+    <div class="card">
+      <h3>Систематический сдвиг</h3>
+      <p>На каком-то интервале глубин вся кривая занижена или завышена. Причина — смена режима прибора, помехи от обсадной трубы, или ошибка при оцифровке старых данных.</p>
+    </div>
+    <div class="card card-purple">
+      <h3>Пропуски (NaN)</h3>
+      <p>Прибор не работал или данные утеряны при архивации. В нашем файле ~70% точек — пропуски. Это не ошибка, а реальность архивных данных. Именно их восстанавливает ML.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ЗАДАНИЕ 1: ВЕРИФИКАЦИЯ КЕРНА -->
+<div class="section-wrap" id="tasks-core">
+  <div class="section-eyebrow">Задание 1</div>
+  <h2>Верификация керновых данных</h2>
+  <p style="color:var(--text2);max-width:680px;margin-bottom:28px;">
+    Файл <span style="font-family:'JetBrains Mono',monospace;background:var(--bg3);padding:1px 6px;border-radius:4px;">core_data_dirty_v2.csv</span> содержит 303 записи по 10 скважинам.
+    В нем спрятаны ошибки 6 типов. Ваша задача — найти их все.
+  </p>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:var(--green-light);color:var(--green);">1.1</div>
+      <div>
+        <div class="task-title">Разведочный анализ данных</div>
+        <div class="task-sub">Понять что лежит в таблице до написания любого кода</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>Прежде чем искать ошибки — изучите данные. Посмотрите на описательную статистику: минимум и максимум каждого столбца. Постройте гистограммы с физическими границами. Аномалии часто видны глазом еще до написания кода.</p>
+      <ul class="task-checklist">
+        <li>Загрузить файл, посмотреть на структуру — сколько строк, какие столбцы, есть ли пропуски</li>
+        <li>Вывести описательную статистику — обратить особое внимание на min и max</li>
+        <li>Построить гистограммы для каждого параметра с обозначением физических границ</li>
+        <li>Построить scatter-диаграмму пористость vs логарифм проницаемости, раскрасить по лабораториям</li>
+        <li>Записать наблюдения: что выглядит подозрительно?</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> понимание структуры данных, визуальная идентификация потенциальных аномалий</div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:var(--green-light);color:var(--green);">1.2</div>
+      <div>
+        <div class="task-title">Правила физичности</div>
+        <div class="task-sub">Перевести знания геолога в код</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>Каждый параметр имеет физические ограничения — нарушение означает гарантированную ошибку вне зависимости от статистики. Правило 1 написано в шаблоне как пример. Остальные три — напишите сами.</p>
+      <ul class="task-checklist">
+        <li>Правило 1 (пористость) — уже написано, изучите как пример</li>
+        <li>Правило 2: написать условие для проницаемости — какие значения физически невозможны?</li>
+        <li>Правило 3: написать условие для плотности — кварц 2.65, кальцит 2.71, доломит 2.87 г/см³</li>
+        <li>Правило 4: написать условие для суммы насыщенностей — нефть + вода не могут превышать 100% пор</li>
+        <li>Для каждого правила вывести список нарушающих строк с указанием скважины и глубины</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> таблица флагов — для каждой строки отмечено какие правила нарушены</div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:var(--green-light);color:var(--green);">1.3</div>
+      <div>
+        <div class="task-title">Дубли, смещения, лаборатории</div>
+        <div class="task-sub">Найти ошибки которые не видны через физичность</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>Три типа ошибок требуют отдельного подхода. Дубли — строка записана дважды. Смещение столбца — значение попало не в тот столбец. Систематическое отклонение — одна лаборатория всегда дает другие цифры.</p>
+      <ul class="task-checklist">
+        <li>Найти строки-дубликаты по ключевым столбцам</li>
+        <li>Найти смещение столбца — посмотрите на значения плотности, среди них есть числа 50–450 г/см³</li>
+        <li>Сравнить медианную пористость между Lab_A, Lab_B и Lab_C — есть ли систематические различия?</li>
+        <li>Построить boxplot пористости по лабораториям</li>
+        <li>Проверить статистически: запустить тест Крускала–Уоллиса. Если p &lt; 0.05 — различия значимы</li>
+        <li>Сформулировать вывод: какая лаборатория отличается и на сколько процентов?</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> найдены все 6 типов ошибок, финальный отчет сохранен в anomaly_report.csv</div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ЗАДАНИЕ 2: ML НА КЕРНЕ -->
+<div class="section-wrap" id="tasks-ml">
+  <div class="section-eyebrow">Задание 2</div>
+  <h2>Машинное обучение на керновых данных</h2>
+  <p style="color:var(--text2);max-width:680px;margin-bottom:28px;">
+    После верификации у вас есть очищенная выборка. Теперь на ней нужно обучить модели.
+     </p>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:var(--purple-light);color:var(--purple);">2.1</div>
+      <div>
+        <div class="task-title">Isolation Forest — поиск аномалий без правил</div>
+        <div class="task-sub">Машина сама решает что «не похоже» на остальные данные</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>В отличие от правил физичности, Isolation Forest не знает никаких границ заранее. Он смотрит на все облако данных и находит точки, которые изолируются быстрее остальных — это и есть аномалии.</p>
+      <ul class="task-checklist">
+        <li>Запустить алгоритм на очищенных данных (без строк с явными физическими ошибками)</li>
+        <li>Подобрать параметр contamination — попробуйте 0.05, 0.10, 0.15. Как меняется результат?</li>
+        <li>Визуализировать: нанести аномалии красными крестиками на scatter-диаграммы</li>
+        <li>Сравнить: какие строки нашел Isolation Forest, но не нашли правила физичности?</li>
+        <li>Сохранить список аномалий в ml_anomalies_IF.csv</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> список аномалий которые не поймали физические правила + понимание разницы между подходами</div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:var(--purple-light);color:var(--purple);">2.2</div>
+      <div>
+        <div class="task-title">KMeans — кластеризация пород (литотипы)</div>
+        <div class="task-sub">Разбить все образцы на группы по схожести свойств</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>Геолог различает типы пород — песчаник, глина, карбонат — по комбинации пористости, проницаемости и плотности. KMeans делает то же самое автоматически, не зная заранее сколько групп искать.</p>
+      <ul class="task-checklist">
+        <li>Запустить метод локтя (elbow method) для k от 2 до 8 — найти оптимальное число кластеров</li>
+        <li>Обучить KMeans с выбранным k на трех признаках: пористость, log(проницаемость), плотность</li>
+        <li>Визуализировать кластеры в трех проекциях: φ vs k, φ vs ρ, k vs ρ</li>
+        <li>Описать каждый кластер: какие у него медианные значения? Какой тип породы это напоминает?</li>
+        <li>Проверить: связаны ли кластеры с геологическими зонами (столбец геол_зона)?</li>
+        <li>Сохранить результат в ml_clusters.csv</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> каждый образец получил метку литотипа — физически интерпретируемую группу</div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:var(--purple-light);color:var(--purple);">2.3</div>
+      <div>
+        <div class="task-title">Random Forest — предсказание проницаемости</div>
+        <div class="task-sub">Восстановить параметр там где его не измерили</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>Проницаемость измеряют не всегда — это дорого и долго. Но она тесно связана с пористостью и плотностью. Random Forest обучается на образцах где проницаемость известна, а потом предсказывает ее там где нет.</p>
+      <ul class="task-checklist">
+        <li>Обучить модель на 80% данных, проверить на 20%</li>
+        <li>Убедиться что работаете в логарифмическом масштабе — log₁₀(k), не k напрямую</li>
+        <li>Оценить качество: R² должен быть выше 0.70. Если ниже — попробуйте добавить признаки</li>
+        <li>Построить график: факт vs прогноз. Точки должны лежать вдоль прямой y=x</li>
+        <li>Посмотреть на feature importance — какой признак влияет на проницаемость больше всего?</li>
+        <li>Применить модель ко всему датасету — предсказать проницаемость для образцов без измерений</li>
+        <li>Сохранить результат в ml_predicted_perm.csv</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> «синтетическая» проницаемость для образцов где ее не измерили + оценка достоверности модели</div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ЗАДАНИЕ 3: ML НА ГИС -->
+<div class="section-wrap" id="tasks-gis">
+  <div class="section-eyebrow">Задание 3</div>
+  <h2>Машинное обучение на ГИС-данных</h2>
+  <p style="color:var(--text2);max-width:680px;margin-bottom:28px;">
+    Файл <span style="font-family:'JetBrains Mono',monospace;background:var(--bg3);padding:1px 6px;border-radius:4px;">gis_data_well45.csv</span> —
+    реальный каротаж скважины Well_45. В нем ~70% пропусков и несколько зашитых ошибок.
+    
+  </p>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:#e8f4ff;color:#1a5a9a;">3.1</div>
+      <div>
+        <div class="task-title">Верификация ГИС-кривых</div>
+        <div class="task-sub">Найти аномалии в каротажных данных — те же принципы, новый тип данных</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>ГИС-данные имеют свои специфические ошибки. Спайки — одиночные аномальные выбросы. Застрявший инструмент — одно значение повторяется подряд много раз. Систематический сдвиг — целый интервал занижен или завышен.</p>
+      <ul class="task-checklist">
+        <li>Построить планшет каротажа — четыре кривые PZ, PS, GK, NGK по глубине вертикально</li>
+        <li>Написать правило для обнаружения спайков GK: значения выше 16 мкР/ч</li>
+        <li>Написать правило для отрицательного PZ: физически невозможно</li>
+        <li>Написать алгоритм поиска застрявшего инструмента: одно значение повторяется 5+ раз подряд</li>
+        <li>Визуально найти систематический сдвиг NGK на каком-то интервале глубин</li>
+        <li>Проверить на тестовом файле gis_data_test_errors.csv — должно найтись все зашитое</li>
+        <li>Проверить на чистом файле gis_data_clean.csv — должно быть 0 физических ошибок</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> планшет каротажа с отмеченными аномалиями, понимание какой интервал проблемный</div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:#e8f4ff;color:#1a5a9a;">3.2</div>
+      <div>
+        <div class="task-title">Анализ корреляций между кривыми</div>
+        <div class="task-sub">Понять физику прежде чем строить модель</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>Прежде чем восстанавливать пропуски, нужно убедиться что между кривыми есть реальная физическая связь. Иначе восстановление не имеет смысла.</p>
+      <ul class="task-checklist">
+        <li>Взять только строки где все 4 кривые доступны одновременно (~3 000 точек)</li>
+        <li>Построить матрицу корреляций</li>
+        <li>Построить scatter-диаграммы для трех пар: NGK vs PS, GK vs NGK, GK vs PS</li>
+        <li>Найти самую сильную корреляцию. Объяснить ее физически — почему эти кривые связаны?</li>
+        <li>Сформулировать вывод: какие кривые лучше всего подходят для взаимного восстановления?</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> понимание физических связей между кривыми — обоснование для следующего шага</div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:#e8f4ff;color:#1a5a9a;">3.3</div>
+      <div>
+        <div class="task-title">Восстановление пропущенных кривых</div>
+        <div class="task-sub">Главный результат: непрерывный каротаж вместо фрагментов</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>70% данных — NaN. Это не значит что они потеряны навсегда. Модель обучается на 30% где данные есть, и предсказывает остальные 70%. Главное условие: кривые-предикторы должны быть доступны в этих точках.</p>
+      <ul class="task-checklist">
+        <li>Обучить модель для восстановления GK — используя глубину, NGK и PS как признаки</li>
+        <li>Обучить модель для восстановления NGK — используя глубину, GK и PS как признаки</li>
+        <li>Обучить модель для восстановления PS — используя глубину, GK и NGK как признаки</li>
+        <li>Для каждой модели: оценить качество на тестовой выборке (R² и MAE)</li>
+        <li>Построить сравнительный планшет: сплошная линия = измерено, пунктир = восстановлено ML</li>
+        <li>Построить диаграмму покрытия: было X% → стало Y% по каждой кривой</li>
+        <li>Сохранить восстановленный датасет в gis_data_restored.csv со столбцами-источниками: measured / ML_predicted / missing</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> непрерывный каротаж по всем кривым — вместо 30% фрагментов теперь 60–80% покрытие</div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-num" style="background:#e8f4ff;color:#1a5a9a;">3.4</div>
+      <div>
+        <div class="task-title">Сопоставление ГИС с керном</div>
+        <div class="task-sub">Проверить: говорят ли два источника данных об одном и том же?</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <p>У нас есть и ГИС, и лабораторный керн по одной скважине. Если данные правильные — они должны согласовываться. Там где керн показывает высокую пористость, NGK должен быть низким.</p>
+      <ul class="task-checklist">
+        <li>Загрузить core_data_well45.csv — 40 образцов керна по скважине Well_45</li>
+        <li>Для каждого образца найти ближайшую точку ГИС по глубине</li>
+        <li>Построить scatter: пористость керна vs NGK из ГИС</li>
+        <li>Посчитать корреляцию между пористостью керна и NGK — ожидается отрицательная</li>
+        <li>Построить совмещенный профиль по глубине: пористость керна и NGK на одном графике</li>
+        <li>Сформулировать вывод: согласуются ли ГИС и керн? Если нет — где расхождения?</li>
+      </ul>
+      <div class="task-result"><strong>Результат:</strong> оценка согласованности данных двух источников — ключевой геологический вывод</div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ЗАДАНИЕ 4: ПРИЛОЖЕНИЕ -->
+<div class="section-wrap" id="app">
+  <div class="section-eyebrow">Задание 4</div>
+  <h2>Десктопное приложение</h2>
+  <p style="color:var(--text2);max-width:680px;margin-bottom:28px;">
+    Весь анализ нужно упаковать в одно приложение с графическим интерфейсом.
+    Пользователь не должен знать Python — он просто нажимает кнопки и получает результат.
+   
+  </p>
+
+  <div class="grid-2" style="margin-bottom:24px;">
+    <div class="result-box" style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+      <div style="padding:16px 24px;background:var(--black);color:#fff;font-size:14px;font-weight:700;">Что должно быть в приложении</div>
+      <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0;">1</div>
+        <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Вкладка верификации керна</strong><span style="font-size:13px;color:var(--text2);">Метрики (число аномалий, доля ошибок), список типов с подсчетом, барплот лабораторий, таблица аномальных строк с подсветкой, кнопка сохранить отчет</span></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0;">2</div>
+        <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Карта скважин</strong><span style="font-size:13px;color:var(--text2);">Три карты: геологические зоны, медианная пористость, концентрация аномалий по скважинам</span></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0;">3</div>
+        <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Профили по глубине</strong><span style="font-size:13px;color:var(--text2);">Выбор любых двух пар скважин из списка, построение профилей пористости с линией тренда</span></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0;">4</div>
+        <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Пространственный анализ</strong><span style="font-size:13px;color:var(--text2);">Вариограмма пористости и сходство скважин в зависимости от расстояния между ними</span></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0;">5</div>
+        <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Планшет ГИС — скважина Well_45</strong><span style="font-size:13px;color:var(--text2);">Четыре кривые по глубине, переключение кривых, выбор интервала глубин, подсветка аномалий, наложение керна</span></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 24px;align-items:flex-start;">
+        <div style="width:24px;height:24px;border-radius:6px;background:var(--purple-light);border:1px solid var(--purple-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--purple);flex-shrink:0;">6</div>
+        <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Восстановление ГИС</strong><span style="font-size:13px;color:var(--text2);">Кнопка «Запустить восстановление» — прямо в приложении обучает модели и показывает планшет: сплошная линия = измерено, пунктир = ML</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="result-box" style="border:1px solid var(--green-border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;">
+        <div style="padding:16px 24px;background:var(--green);color:#fff;font-size:14px;font-weight:700;">Как проверить что работает</div>
+        <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);align-items:flex-start;">
+          <div style="width:24px;height:24px;border-radius:6px;background:var(--green-light);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0;">A</div>
+          <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Тест на ошибках (керн)</strong><span style="font-size:13px;color:var(--text2);">Загрузить core_data_test_errors.csv — должно найтись 6 типов ошибок</span></div>
+        </div>
+        <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);align-items:flex-start;">
+          <div style="width:24px;height:24px;border-radius:6px;background:var(--green-light);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0;">B</div>
+          <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Тест на чистых данных (керн)</strong><span style="font-size:13px;color:var(--text2);">Загрузить core_data_clean.csv — приложение должно показать 0 аномалий</span></div>
+        </div>
+        <div style="display:flex;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);align-items:flex-start;">
+          <div style="width:24px;height:24px;border-radius:6px;background:var(--green-light);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0;">C</div>
+          <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Тест на ошибках (ГИС)</strong><span style="font-size:13px;color:var(--text2);">Загрузить gis_data_test_errors.csv — на планшете должны появиться красные точки в нужных местах</span></div>
+        </div>
+        <div style="display:flex;gap:14px;padding:14px 24px;align-items:flex-start;">
+          <div style="width:24px;height:24px;border-radius:6px;background:var(--green-light);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0;">D</div>
+          <div><strong style="font-size:14px;font-weight:600;display:block;margin-bottom:2px;">Тест чистого ГИС</strong><span style="font-size:13px;color:var(--text2);">Загрузить gis_data_clean.csv — 0 физических ошибок</span></div>
+        </div>
+      </div>
+
+      <div class="note-amber">
+        <strong>Важно для Spyder:</strong> Все диалоги открываются в папке проекта.
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ПЛАН ПО ДНЯМ -->
+<div class="section-wrap">
+  <div class="section-eyebrow">Расписание</div>
+  <h2>Распределение задач</h2>
+  <div class="timeline">
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot active">1</div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <h4>Знакомство с данными</h4>
+        <p>Задание 1.1 — разведочный анализ керна и ГИС. Построить гистограммы, посмотреть статистику, записать наблюдения. Разобраться что такое каротаж и как читать планшет.</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot active">2</div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <h4>Верификация керна</h4>
+        <p>Задания 1.2 и 1.3 — написать правила физичности, найти дубли и смещения, сравнить лаборатории. Сохранить anomaly_report.csv.</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot active">3</div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <h4>Верификация ГИС + корреляции</h4>
+        <p>Задания 3.1 и 3.2 — построить планшет каротажа, найти ошибки ГИС, изучить корреляции между кривыми, объяснить их физически.</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot active" style="font-size:10px;">4–5</div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <h4>Машинное обучение</h4>
+        <p>Задания 2.1–2.3 и 3.3 — Isolation Forest, KMeans, Random Forest на керне. Восстановление ГИС-кривых. Сопоставление ГИС с керном.</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot">6</div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <h4>Приложение</h4>
+        <p>Задание 4 — собрать все в одно приложение. Проверить на всех тестовых файлах. Убедиться что все 6 вкладок работают.</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-dot">7</div></div>
+      <div class="tl-content">
+        <h4>Презентация</h4>
+        <p>Демо приложения. Рассказать: что нашли, что восстановили, что это означает геологически. Показать графики — планшет до и после восстановления.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- УРОВНИ ОЦЕНКИ -->
+<div class="section-wrap" id="levels">
+  <div class="section-eyebrow">Оценка</div>
+  <h2>Уровни результата</h2>
+  <div class="levels">
+    <div class="level">
+      <span class="level-badge" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border2);">Базовый</span>
+      <div class="level-desc">Задание 1: найдены все 6 типов ошибок в керне, сохранен anomaly_report.csv. Задание 3.1: построен планшет каротажа, найдены спайки и отрицательный PZ.</div>
+    </div>
+    <div class="level">
+      <span class="level-badge" style="background:#e8f4ff;color:#1a6fc4;border:1px solid #b8d8f8;">Хороший</span>
+      <div class="level-desc">+ Задание 2.1: Isolation Forest. + Задание 3.2: корреляции ГИС с физическим объяснением. + Задание 3.3: восстановление хотя бы одной кривой с R² &gt; 0.60.</div>
+    </div>
+    <div class="level">
+      <span class="level-badge" style="background:var(--purple-light);color:var(--purple);border:1px solid var(--purple-border);">Отличный</span>
+      <div class="level-desc">+ Задания 2.2 и 2.3: KMeans с интерпретацией литотипов, Random Forest с R² &gt; 0.70. + Задание 3.3: восстановление GK, NGK, PS. + Работающее приложение с первыми пятью вкладками.</div>
+    </div>
+    <div class="level" style="border-color:var(--green-border);background:var(--green-light);">
+      <span class="level-badge" style="background:var(--green);color:#fff;border:1px solid var(--green);">Блестяще</span>
+      <div class="level-desc" style="color:#0a5a3a;">+ Задание 3.4: сопоставление ГИС с керном с геологическим выводом. + Шестая вкладка восстановления в приложении. + Презентация с интерпретацией результатов.</div>
+    </div>
+
+
+<hr>
+<footer>
+  <div>Задание команде · ИИ-детектив для нефтяных данных · АльметТех AWW 2026</div>
+  <div>
+    <a href="https://almet.pish.itmo.ru/aww" target="_blank">almet.pish.itmo.ru/aww</a>
+    &nbsp;·&nbsp;
+    <a href="https://t.me/almet_tech" target="_blank">@almet_tech</a>
+  </div>
+</footer>
+
+</body>
+</html>
