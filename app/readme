@@ -1,0 +1,9 @@
+cmd
+
+!pip install PyQt6 pandas numpy matplotlib scipy scikit-learn
+
+E:
+
+cd E:\AWW\Many_wells_2
+
+python well_verifier.py
